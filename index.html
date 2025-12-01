@@ -15,10 +15,12 @@
 
   <style>
     :root {
-      --door-main: #E05D47;          /* MyAdvent-Hellrot */
-      --door-locked: #b44834;        /* etwas dunkler für gesperrte Tage */
+      /* etwas hellere Rot-Töne für die Türchen */
+      --door-main: #F47C6A;          /* helles, warmes Rot */
+      --door-locked: #E05D47;        /* etwas dunkler für gesperrte Tage */
       --door-text: #ffffff;
-      --overlay-bg: rgba(0, 0, 0, 0.75);
+
+      --overlay-bg: rgba(0, 0, 0, 0.6);
       --panel-bg: rgba(5, 10, 20, 0.95);
       --accent: #ffd166;
       --text: #f8f9fa;
@@ -46,8 +48,8 @@
       min-height: 100vh;
       background: radial-gradient(
         circle at top,
-        rgba(0, 0, 0, 0.3),
-        rgba(0, 0, 0, 0.8)
+        rgba(0, 0, 0, 0.25),
+        rgba(0, 0, 0, 0.75)
       );
       display: flex;
       flex-direction: column;
@@ -57,15 +59,19 @@
     header {
       text-align: center;
       padding: 1.5rem 1rem 0.5rem;
+      display: flex;
+      justify-content: center;
     }
 
     .title-box {
-      display: inline-block;
-      padding: 0.9rem 2.4rem 0.7rem;
+      display: block;
+      padding: 0.8rem 2.2rem 0.7rem;
       border-radius: 0.8rem;
-      background: rgba(110, 103, 148, 0.9); /* lila wie beim MyAdvent-Banner */
-      border: 2px dashed rgba(255, 255, 255, 0.85);
+      background: rgba(180, 145, 230, 0.9); /* helleres Lila */
+      border: 2px dashed rgba(255, 255, 255, 0.9);
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+      max-width: 520px;
+      width: 100%;
     }
 
     .title-main {
@@ -117,8 +123,21 @@
     }
 
     @media (max-width: 480px) {
+      /* auf dem Smartphone soll das Lila-Feld nicht breiter sein als der Kalender */
+      header {
+        padding-top: 1.2rem;
+      }
+      .title-box {
+        max-width: 320px;
+        padding: 0.7rem 1rem 0.6rem;
+      }
+      .calendar {
+        max-width: 320px;
+      }
       .calendar-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        padding: 0.5rem;
       }
     }
 
@@ -153,14 +172,12 @@
 
     .door-locked {
       background: var(--door-locked);
-      opacity: 0.75;
+      opacity: 0.8;
     }
 
     .door-locked:disabled {
       cursor: not-allowed;
     }
-
-    /* Kein Footer-Text mehr – darum kein footer-Styling */
 
     /* MODAL / INHALTSFENSTER */
 
@@ -241,7 +258,7 @@
   <div class="page-overlay">
     <header>
       <div class="title-box">
-        <h1 class="title-main">Madhouse Adventskalender</h1>
+        <h1 class="title-main">MADHOUSE ADVENTSKALENDER</h1>
         <p class="title-sub">Made by Eltern</p>
       </div>
     </header>
@@ -307,127 +324,103 @@
       - YouTube + Text    → { text: "...", youtube: "https://youtube..." }
     */
 
-   const adventContent = {
-  1: {
-    title: "1. Dezember 🎅",
-    text: "Heute startet der MADHOUSE Adventskalender! Heute Abend machen wir es uns gemeinsam gemütlich – mit Kerzenlicht und vielleicht einer heißen Schokolade.",
-    // Hier könnt ihr z.B. ein Familienfoto einbinden:
-    // image: "bilder/tag01_familie.jpg",
-    // imageAlt: "Familienfoto"
-  },
-  2: {
-    title: "2. Dezember ❄️",
-    text: "Heute gibt es eine kleine Überraschung in der Küche. Schau nach dem Abendessen nach – irgendwo hat sich etwas Leckeres versteckt."
-  },
-  3: {
-    title: "3. Dezember ✨",
-    text: "Heute malen wir gemeinsam ein Winterbild. Du darfst entscheiden: Schneemann, Haus im Schnee oder unsere Familie im Winterland.",
-    // image: "bilder/tag03_kunstwerk.jpg",
-    // imageAlt: "Euer Winterbild"
-  },
-  4: {
-    title: "4. Dezember 🎧",
-    text: "Heute erzählt Mama oder Papa eine kleine Gute-Nacht-Geschichte – vielleicht über Elfen, Rentiere oder magische Schneeflocken.",
-    // audio: "audio/tag04_geschichte.mp3"
-  },
-  5: {
-    title: "5. Dezember 🕯",
-    text: "Heute zünden wir gemeinsam eine Kerze an und nennen nacheinander Dinge, für die wir dankbar sind. Jeder kommt mindestens einmal dran."
-  },
-  6: {
-    title: "6. Dezember – Nikolaus 🎁",
-    text: "Schau heute Morgen oder Abend ganz genau in deine Schuhe… Vielleicht war jemand mit roter Mütze da. 😉",
-    // image: "bilder/tag06_schuhe.jpg",
-    // imageAlt: "Nikolaus-Stiefel"
-  },
-  7: {
-    title: "7. Dezember 🎬",
-    text: "Heute ist Filmabend! Du darfst einen Weihnachts- oder Winterfilm vorschlagen. Popcorn ist ausdrücklich erlaubt.",
-    // video: "video/tag07_familiengruss.mp4"
-  },
-  8: {
-    title: "8. Dezember ☕",
-    text: "Heute probieren wir ein warmes Wintergetränk aus: Kakao, Tee oder etwas anderes – du darfst mitentscheiden, was es gibt."
-  },
-  9: {
-    title: "9. Dezember 📸",
-    text: "Heute machen wir ein lustiges Winter-Foto-Shooting: verrückte Posen, Mützen, Schals – alles ist erlaubt.",
-    // image: "bilder/tag09_fotoshooting.jpg",
-    // imageAlt: "Lustiges Familienfoto"
-  },
-  10: {
-    title: "10. Dezember ⭐",
-    text: "Heute basteln wir zusammen etwas Kleines für jemand anderen: eine Karte, ein Bild oder eine kleine Überraschung.",
-    // image: "bilder/tag10_basteln.jpg"
-  },
-  11: {
-    title: "11. Dezember 🎵",
-    text: "Heute suchen wir ein Winter- oder Weihnachtslied aus und hören oder singen es gemeinsam.",
-    // audio: "audio/tag11_lied.mp3"
-  },
-  12: {
-    title: "12. Dezember 🍪",
-    text: "Heute wird gebacken! Plätzchen, Muffins oder etwas anderes Süßes. Du darfst die Ausstechformen oder Deko aussuchen.",
-    // image: "bilder/tag12_plaetzchen.jpg"
-  },
-  13: {
-    title: "13. Dezember 💌",
-    text: "Heute schreiben oder malen wir jemandem eine kleine Karte: Oma, Opa, Freunde oder jemand, der sich besonders darüber freut."
-  },
-  14: {
-    title: "14. Dezember 🧣",
-    text: "Heute machen wir es uns extra gemütlich: Decken, Kissen, vielleicht ein Hörspiel oder ein gemeinsames Buch.",
-    // audio: "audio/tag14_hoerspiel.mp3"
-  },
-  15: {
-    title: "15. Dezember 🎲",
-    text: "Heute ist Spielezeit! Wir spielen gemeinsam ein Brettspiel oder Kartenspiel – du darfst aussuchen, welches."
-  },
-  16: {
-    title: "16. Dezember 🎨",
-    text: "Heute gestalten wir etwas für unser Zuhause: vielleicht ein kleines Schild, einen Stern oder eine Girlande zum Aufhängen.",
-    // image: "bilder/tag16_deko.jpg"
-  },
-  17: {
-    title: "17. Dezember 🎧 & 📖",
-    text: "Heute gibt es eine vorgelesene Geschichte. Wenn du möchtest, nehmen wir sie sogar auf, damit du sie später nochmal hören kannst.",
-    // audio: "audio/tag17_vorlesegeschichte.mp3"
-  },
-  18: {
-    title: "18. Dezember 🌙",
-    text: "Heute machen wir vor dem Schlafengehen eine kleine Traumreise: Wir stellen uns vor, wie unser perfekter Wintertag aussehen würde."
-  },
-  19: {
-    title: "19. Dezember 🎥",
-    text: "Heute drehen wir ein mini Familien-Video: Jede Person sagt einen Satz, warum sie die anderen lieb hat.",
-    // video: "video/tag19_familienvideo.mp4"
-  },
-  20: {
-    title: "20. Dezember 🎁",
-    text: "Heute überlegen wir gemeinsam: Wem könnten wir in den nächsten Tagen eine kleine Freude machen – ganz ohne Geld auszugeben?"
-  },
-  21: {
-    title: "21. Dezember ❄️",
-    text: "Heute gibt es – wenn möglich – einen kleinen Spaziergang: durch den Schnee, durch die Stadt oder einfach nur ums Haus. Danach warten etwas Warmes zu trinken und vielleicht ein Keks.",
-    // image: "bilder/tag21_spaziergang.jpg"
-  },
-  22: {
-    title: "22. Dezember 🌟",
-    text: "Heute erinnern wir uns: Was war bisher dein Lieblingsmoment in diesem Advent? Jeder darf etwas erzählen."
-  },
-  23: {
-    title: "23. Dezember 🎄",
-    text: "Heute bereiten wir etwas für den Heiligabend vor: Deko, Tisch, Musikliste oder ein kleines Programm – du darfst mitplanen.",
-    // image: "bilder/tag23_baum.jpg"
-  },
-  24: {
-    title: "24. Dezember – Frohe Weihnachten 🎁",
-    text: "Heute ist Weihnachten! Wir sind so froh, dass wir dich haben. Du bist unser größtes Geschenk. ❤️",
-    // optionales Abschlussbild:
-    // image: "bilder/tag24_weihnachten.jpg"
-  }
-};
-
+    const adventContent = {
+      1: {
+        title: "1. Dezember 🎅",
+        text: "Heute startet der MADHOUSE Adventskalender! Heute Abend machen wir es uns gemeinsam gemütlich – mit Kerzenlicht und vielleicht einer heißen Schokolade."
+      },
+      2: {
+        title: "2. Dezember ❄️",
+        text: "Heute gibt es eine kleine Überraschung in der Küche. Schau nach dem Abendessen nach – irgendwo hat sich etwas Leckeres versteckt."
+      },
+      3: {
+        title: "3. Dezember ✨",
+        text: "Heute malen wir gemeinsam ein Winterbild. Du darfst entscheiden: Schneemann, Haus im Schnee oder unsere Familie im Winterland."
+      },
+      4: {
+        title: "4. Dezember 🎧",
+        text: "Heute erzählt Mama oder Papa eine kleine Gute-Nacht-Geschichte – vielleicht über Elfen, Rentiere oder magische Schneeflocken."
+      },
+      5: {
+        title: "5. Dezember 🕯",
+        text: "Heute zünden wir gemeinsam eine Kerze an und nennen nacheinander Dinge, für die wir dankbar sind. Jeder kommt mindestens einmal dran."
+      },
+      6: {
+        title: "6. Dezember – Nikolaus 🎁",
+        text: "Schau heute Morgen oder Abend ganz genau in deine Schuhe… Vielleicht war jemand mit roter Mütze da. 😉"
+      },
+      7: {
+        title: "7. Dezember 🎬",
+        text: "Heute ist Filmabend! Du darfst einen Weihnachts- oder Winterfilm vorschlagen. Popcorn ist ausdrücklich erlaubt."
+      },
+      8: {
+        title: "8. Dezember ☕",
+        text: "Heute probieren wir ein warmes Wintergetränk aus: Kakao, Tee oder etwas anderes – du darfst mitentscheiden, was es gibt."
+      },
+      9: {
+        title: "9. Dezember 📸",
+        text: "Heute machen wir ein lustiges Winter-Foto-Shooting: verrückte Posen, Mützen, Schals – alles ist erlaubt."
+      },
+      10: {
+        title: "10. Dezember ⭐",
+        text: "Heute basteln wir zusammen etwas Kleines für jemand anderen: eine Karte, ein Bild oder eine kleine Überraschung."
+      },
+      11: {
+        title: "11. Dezember 🎵",
+        text: "Heute suchen wir ein Winter- oder Weihnachtslied aus und hören oder singen es gemeinsam."
+      },
+      12: {
+        title: "12. Dezember 🍪",
+        text: "Heute wird gebacken! Plätzchen, Muffins oder etwas anderes Süßes. Du darfst die Ausstechformen oder Deko aussuchen."
+      },
+      13: {
+        title: "13. Dezember 💌",
+        text: "Heute schreiben oder malen wir jemandem eine kleine Karte: Oma, Opa, Freunde oder jemand, der sich besonders darüber freut."
+      },
+      14: {
+        title: "14. Dezember 🧣",
+        text: "Heute machen wir es uns extra gemütlich: Decken, Kissen, vielleicht ein Hörspiel oder ein gemeinsames Buch."
+      },
+      15: {
+        title: "15. Dezember 🎲",
+        text: "Heute ist Spielezeit! Wir spielen gemeinsam ein Brettspiel oder Kartenspiel – du darfst aussuchen, welches."
+      },
+      16: {
+        title: "16. Dezember 🎨",
+        text: "Heute gestalten wir etwas für unser Zuhause: vielleicht ein kleines Schild, einen Stern oder eine Girlande zum Aufhängen."
+      },
+      17: {
+        title: "17. Dezember 🎧 & 📖",
+        text: "Heute gibt es eine vorgelesene Geschichte. Wenn du möchtest, nehmen wir sie sogar auf, damit du sie später nochmal hören kannst."
+      },
+      18: {
+        title: "18. Dezember 🌙",
+        text: "Heute machen wir vor dem Schlafengehen eine kleine Traumreise: Wir stellen uns vor, wie unser perfekter Wintertag aussehen würde."
+      },
+      19: {
+        title: "19. Dezember 🎥",
+        text: "Heute drehen wir ein mini Familien-Video: Jede Person sagt einen Satz, warum sie die anderen lieb hat."
+      },
+      20: {
+        title: "20. Dezember 🎁",
+        text: "Heute überlegen wir gemeinsam: Wem könnten wir in den nächsten Tagen eine kleine Freude machen – ganz ohne Geld auszugeben?"
+      },
+      21: {
+        title: "21. Dezember ❄️",
+        text: "Heute gibt es – wenn möglich – einen kleinen Spaziergang: durch den Schnee, durch die Stadt oder einfach nur ums Haus. Danach warten etwas Warmes zu trinken und vielleicht ein Keks."
+      },
+      22: {
+        title: "22. Dezember 🌟",
+        text: "Heute erinnern wir uns: Was war bisher dein Lieblingsmoment in diesem Advent? Jeder darf etwas erzählen."
+      },
+      23: {
+        title: "23. Dezember 🎄",
+        text: "Heute bereiten wir etwas für den Heiligabend vor: Deko, Tisch, Musikliste oder ein kleines Programm – du darfst mitplanen."
+      },
+      24: {
+        title: "24. Dezember – Frohe Weihnachten 🎁",
+        text: "Heute ist Weihnachten! Wir sind so froh, dass wir dich haben. Du bist unser größtes Geschenk. ❤️"
+      }
     };
 
     function getQueryParam(name) {
@@ -564,4 +557,3 @@
   </script>
 </body>
 </html>
-
