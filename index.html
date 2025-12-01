@@ -2,18 +2,26 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Madhouse Adventskalender</title>
+  <title>MADHOUSE ADVENTSKALENDER</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google-Fonts: ähnlich wie beim MyAdvent-Design -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Dancing+Script:wght@500;600&display=swap"
+    rel="stylesheet"
+  >
+
   <style>
     :root {
-      --bg-fallback: #0b1c2c;
-      --text: #f8f9fa;
-      --door-open: #d00000;
-      --door-locked: #8d0801;
-      --door-text: #fff;
+      --door-main: #E05D47;          /* MyAdvent-Hellrot */
+      --door-locked: #b44834;        /* etwas dunkler für gesperrte Tage */
+      --door-text: #ffffff;
       --overlay-bg: rgba(0, 0, 0, 0.75);
-      --panel-bg: rgba(8, 20, 30, 0.9);
+      --panel-bg: rgba(5, 10, 20, 0.95);
       --accent: #ffd166;
+      --text: #f8f9fa;
     }
 
     * {
@@ -25,42 +33,57 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
       color: var(--text);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      background-color: var(--bg-fallback);
+
+      /* dein Hintergrundbild */
       background-image: url("background.jpg");
-      background-repeat: no-repeat;
       background-size: cover;
       background-position: center center;
-    }
-
-    /* leichter Verlauf, damit Text lesbar bleibt */
-    .page-overlay {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      background: radial-gradient(
-        circle at top,
-        rgba(0, 0, 0, 0.25),
-        rgba(0, 0, 0, 0.75)
-      );
+      background-repeat: no-repeat;
       min-height: 100vh;
     }
 
-    header,
-    footer {
-      text-align: center;
-      padding: 1.5rem 1rem 1rem;
+    .page-overlay {
+      min-height: 100vh;
+      background: radial-gradient(
+        circle at top,
+        rgba(0, 0, 0, 0.3),
+        rgba(0, 0, 0, 0.8)
+      );
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
     }
 
-    header h1 {
+    header {
+      text-align: center;
+      padding: 1.5rem 1rem 0.5rem;
+    }
+
+    .title-box {
+      display: inline-block;
+      padding: 0.9rem 2.4rem 0.7rem;
+      border-radius: 0.8rem;
+      background: rgba(110, 103, 148, 0.9); /* lila wie beim MyAdvent-Banner */
+      border: 2px dashed rgba(255, 255, 255, 0.85);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.7);
+    }
+
+    .title-main {
       margin: 0;
-      font-size: clamp(1.8rem, 3vw, 2.5rem);
-      letter-spacing: 0.05em;
-      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+      font-family: "Fredoka", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: center;
+    }
+
+    .title-sub {
+      margin: 0.25rem 0 0;
+      font-family: "Dancing Script", system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", cursive;
+      font-size: clamp(1.1rem, 2.1vw, 1.4rem);
+      text-align: center;
     }
 
     main {
@@ -68,12 +91,12 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 1rem;
+      padding: 1.2rem 1rem 2rem;
     }
 
-    .calendar-wrapper {
+    .calendar {
       width: 100%;
-      max-width: 520px;
+      max-width: 760px;
       margin: 0 auto;
       display: flex;
       justify-content: center;
@@ -82,9 +105,9 @@
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(6, minmax(0, 1fr));
-      gap: 0.6rem;
+      gap: 0.7rem;
       width: 100%;
-      padding: 0.5rem;
+      padding: 0.75rem;
     }
 
     @media (max-width: 700px) {
@@ -100,47 +123,44 @@
     }
 
     .door {
+      border-radius: 0;             /* rechteckig */
       border: none;
-      border-radius: 0; /* rechteckig */
       padding: 0.9rem 0.4rem;
       cursor: pointer;
-      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      font-size: clamp(1rem, 2.6vw, 1.3rem);
       font-weight: 700;
       color: var(--door-text);
-      background: var(--door-locked);
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+      background: var(--door-main);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
       transition: transform 0.12s ease, box-shadow 0.12s ease,
-        background 0.2s ease, opacity 0.2s ease;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+        background 0.18s ease, opacity 0.18s ease;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
     }
 
     .door-openable {
-      background: var(--door-open);
+      background: var(--door-main);
     }
 
     .door-openable:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 9px 18px rgba(0, 0, 0, 0.85);
     }
 
     .door-openable:active {
       transform: translateY(1px);
-      box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 9px rgba(0, 0, 0, 0.6);
     }
 
     .door-locked {
       background: var(--door-locked);
-      opacity: 0.8;
+      opacity: 0.75;
     }
 
     .door-locked:disabled {
       cursor: not-allowed;
     }
 
-    footer {
-      font-size: 0.95rem;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
-    }
+    /* Kein Footer-Text mehr – darum kein footer-Styling */
 
     /* MODAL / INHALTSFENSTER */
 
@@ -167,8 +187,8 @@
       overflow-y: auto;
       background: var(--panel-bg);
       border-radius: 1.2rem;
-      padding: 1.2rem 1.25rem 1.5rem;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      padding: 1.25rem 1.3rem 1.6rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9);
     }
 
     .modal h2 {
@@ -185,12 +205,12 @@
 
     .close-button {
       position: absolute;
-      top: 0.3rem;
-      right: 0.6rem;
+      top: 0.1rem;
+      right: 0.7rem;
       border: none;
       background: none;
       color: var(--text);
-      font-size: 1.6rem;
+      font-size: 1.8rem;
       cursor: pointer;
     }
 
@@ -220,18 +240,17 @@
 <body>
   <div class="page-overlay">
     <header>
-      <h1>Madhouse Adventskalender</h1>
+      <div class="title-box">
+        <h1 class="title-main">Madhouse Adventskalender</h1>
+        <p class="title-sub">Made by Eltern</p>
+      </div>
     </header>
 
     <main>
-      <section class="calendar-wrapper">
+      <section class="calendar">
         <div id="calendar-grid" class="calendar-grid"></div>
       </section>
     </main>
-
-    <footer>
-      Von Mama und Papa ❤️
-    </footer>
   </div>
 
   <!-- MODAL für Inhalte -->
@@ -267,42 +286,46 @@
 
   <script>
     /*
-      Advent-Inhalte:
-      Du kannst pro Tag beliebige Kombinationen verwenden:
+      HIER TRAGST DU DEINE INHALTE EIN:
 
-      title: Überschrift (optional, sonst "Tag X")
-      text: Text oder Geschichte
-      image: Bild-URL (z.B. "https://.../bild1.jpg" oder "bilder/tag1.jpg")
+      Für jeden Tag (1–24) kannst du beliebige Kombinationen nutzen:
+
+      title: Überschrift (optional)
+      text: Text / Botschaft / Aufgabe
+      image: Bild-URL (z.B. "bilder/tag1.jpg" oder "https://.../bild.jpg")
       imageAlt: Alternativtext fürs Bild
-      audio: Audio-URL (z.B. MP3)
-      video: Video-Datei (z.B. MP4)
-      youtube: YouTube-Link (z.B. "https://www.youtube.com/watch?v=...")
+      audio: Audio-Datei (z.B. "audio/tag1.mp3")
+      video: Video-Datei (z.B. "video/tag1.mp4")
+      youtube: YouTube-Link ("https://www.youtube.com/watch?v=...")
 
-      Beispiele unten (nur ein paar Tage ausgefüllt – du kannst alle 24 ergänzen)
+      Beispiel-Kombinationen:
+      - nur Text          → { text: "..." }
+      - Text + Bild       → { text: "...", image: "bilder/...", imageAlt: "..." }
+      - nur Audio         → { audio: "audio/..." }
+      - Audio + Text      → { text: "...", audio: "audio/..." }
+      - Video + Text      → { text: "...", video: "video/..." }
+      - YouTube + Text    → { text: "...", youtube: "https://youtube..." }
     */
 
     const adventContent = {
       1: {
         title: "1. Dezember 🎅",
-        text: "Heute startet der Madhouse Adventskalender. Heute Abend machen wir es uns gemeinsam gemütlich.",
-        // Beispiel: Bild vom Hintergrund (falls du willst)
-        // image: "background.jpg",
-        // imageAlt: "Katze im Schnee"
+        text: "Heute startet der Madhouse Adventskalender. Heute Abend machen wir es uns gemeinsam gemütlich."
       },
       2: {
         title: "2. Dezember ❄️",
-        text: "Heute gibt es eine kleine Überraschung in der Küche. Schau nach dem Abendessen nach.",
+        text: "Heute gibt es eine kleine Überraschung in der Küche. Schau nach dem Abendessen nach."
       },
       3: {
         title: "3. Dezember ✨",
-        text: "Hier könnte ein Bild mit Text stehen.",
+        text: "Hier könnte ein Text mit Bild stehen.",
         // image: "bilder/tag3.jpg",
-        // imageAlt: "Beispielmotiv"
+        // imageAlt: "Beispiel-Bild"
       },
       4: {
         title: "4. Dezember 🎧",
         text: "Heute liest Mama oder Papa euch eine Geschichte vor – hier ist die Audio-Version:",
-        // audio: "audio/tag4-geschichte.mp3"
+        // audio: "audio/geschichte4.mp3"
       },
       5: {
         title: "5. Dezember 🎬",
@@ -311,18 +334,29 @@
         // oder:
         // youtube: "https://www.youtube.com/watch?v=DEIN_VIDEO_ID"
       },
+      // … weitere Tage nach dem gleichen Muster …
       24: {
         title: "24. Dezember – Frohe Weihnachten 🎁",
-        text: "Wir sind so dankbar, dass wir euch haben. Ihr seid unser größtes Geschenk.",
-        // image: "bilder/weihnachten.jpg",
-        // imageAlt: "Weihnachtsbaum"
-      },
+        text: "Wir sind so dankbar, dass wir euch haben. Ihr seid unser größtes Geschenk."
+      }
     };
 
+    function getQueryParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
+
+    function isPreviewMode() {
+      return getQueryParam("preview") === "1";
+    }
+
+    // Türchen sind nur bis zum heutigen Tag (im Dezember) geöffnet.
     function isDayOpenable(day) {
+      if (isPreviewMode()) return true; // Eltern-Vorschau
+
       const today = new Date();
-      // Nur im Dezember "richtig" sperren.
       if (today.getMonth() !== 11) {
+        // nicht Dezember → alles zu
         return false;
       }
       return today.getDate() >= day;
@@ -344,7 +378,7 @@
       const ytWrapper = document.getElementById("youtube-wrapper");
       const ytEl = document.getElementById("content-youtube");
 
-      // Türen erzeugen
+      // Türen erzeugen (1–24)
       for (let day = 1; day <= 24; day++) {
         const btn = document.createElement("button");
         btn.className = "door";
@@ -371,7 +405,7 @@
         titleEl.textContent = data.title || `Tag ${day}`;
         textEl.textContent = data.text || "";
 
-        // alles zurücksetzen
+        // Medien zurücksetzen
         imgWrapper.classList.remove("visible");
         audioWrapper.classList.remove("visible");
         videoWrapper.classList.remove("visible");
