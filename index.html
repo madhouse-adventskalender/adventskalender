@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>Unser Familien-Adventskalender</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0b1c2c;
+      --accent: #e63946;
+      --accent-soft: #f1faee;
+      --gold: #f4a261;
+      --card: #1d3557;
+      --text: #f1faee;
+      --locked: #457b9d;
+      --openable: #2a9d8f;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: radial-gradient(circle at top, #264653, var(--bg));
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .header, .footer {
+      text-align: center;
+      padding: 1.5rem 1rem;
+    }
+    .header h1 { margin: 0; font-size: 2rem; }
+    .main {
+      flex: 1;
+      padding: 1rem;
+      max-width: 1000px;
+      margin: 0 auto 2rem auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .calendar {
+      background: rgba(5, 12, 20, 0.7);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.75rem;
+    }
+    @media (max-width: 700px) {
+      .calendar-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 480px) {
+      .calendar-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    .door {
+      position: relative;
+      border: none;
+      border-radius: 0.8rem;
+      padding: 1.2rem 0.5rem;
+      cursor: pointer;
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: var(--locked);
+      color: var(--text);
+    }
+    .door-openable {
+      background: linear-gradient(135deg, var(--openable), #52b788);
+    }
+    .door-openable:hover {
+      transform: translateY(-2px);
+    }
+    .door-locked {
+      background: linear-gradient(135deg, var(--locked), #1d3557);
+      opacity: 0.85;
+    }
+    .content {
+      position: relative;
+      background: linear-gradient(135deg, var(--card), #0f1f3a);
+      border-radius: 1.5rem;
+      padding: 1.25rem 1rem 1.5rem 1rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>🎄 Unser Familien-Adventskalender 🎄</h1>
+  </header>
+
+  <main class="main">
+    <section class="calendar">
+      <div id="calendar-grid" class="calendar-grid"></div>
+    </section>
+
+    <section id="content-section" class="content hidden">
+      <button id="close-content" class="close-button" aria-label="Schließen">X</button>
+      <h2 id="content-title"></h2>
+      <p id="content-text"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    Mit Liebe gemacht ❤️
+  </footer>
+
+  <script>
+    const adventContent = {
+      1: { title: "1. Dezember 🎅", text: "Heute startet unser Advent!" },
+      2: { title: "2. Dezember ❄️", text: "Ein kleiner Gruß für dich." },
+      3: { title: "3. Dezember ⭐", text: "Du bist toll!" },
+      24: { title: "🎁 Frohe Weihnachten 🎁", text: "Wir lieben euch!" }
+    };
+
+    function getToday() {
+      const d = new Date();
+      return (d.getMonth() === 11) ? d.getDate() : 0;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const grid = document.getElementById("calendar-grid");
+      const contentSection = document.getElementById("content-section");
+      const closeBtn = document.getElementById("close-content");
+      const title = document.getElementById("content-title");
+      const text = document.getElementById("content-text");
+
+      const currentDay = getToday();
+
+      for (let day = 1; day <= 24; day++) {
+        const btn = document.createElement("button");
+        btn.className = "door";
+        btn.textContent = day;
+
+        if (day <= currentDay) {
+          btn.classList.add("door-openable");
+          btn.onclick = () => openDay(day);
+        } else {
+          btn.classList.add("door-locked");
+          btn.disabled = true;
+        }
+        grid.appendChild(btn);
+      }
+
+      function openDay(day) {
+        const data = adventContent[day];
+        if (!data) return;
+
+        title.textContent = data.title;
+        text.textContent = data.text;
+        contentSection.classList.remove("hidden");
+      }
+
+      closeBtn.onclick = () => {
+        contentSection.classList.add("hidden");
+      };
+    });
+  </script>
+</body>
+</html>
