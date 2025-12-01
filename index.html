@@ -2,161 +2,441 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8" />
-  <title>Unser Familien-Adventskalender</title>
+  <title>Madhouse Adventskalender</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #0b1c2c;
-      --accent: #e63946;
-      --accent-soft: #f1faee;
-      --gold: #f4a261;
-      --card: #1d3557;
-      --text: #f1faee;
-      --locked: #457b9d;
-      --openable: #2a9d8f;
+      --bg-fallback: #0b1c2c;
+      --text: #f8f9fa;
+      --door-open: #d00000;
+      --door-locked: #8d0801;
+      --door-text: #fff;
+      --overlay-bg: rgba(0, 0, 0, 0.75);
+      --panel-bg: rgba(8, 20, 30, 0.9);
+      --accent: #ffd166;
     }
-    * { box-sizing: border-box; }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      font-family: system-ui, sans-serif;
-      background: radial-gradient(circle at top, #264653, var(--bg));
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
       color: var(--text);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      align-items: stretch;
+      background-color: var(--bg-fallback);
+      background-image: url("background.jpg");
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center center;
     }
-    .header, .footer {
-      text-align: center;
-      padding: 1.5rem 1rem;
-    }
-    .header h1 { margin: 0; font-size: 2rem; }
-    .main {
+
+    /* leichter Verlauf, damit Text lesbar bleibt */
+    .page-overlay {
       flex: 1;
-      padding: 1rem;
-      max-width: 1000px;
-      margin: 0 auto 2rem auto;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
+      align-items: stretch;
+      background: radial-gradient(
+        circle at top,
+        rgba(0, 0, 0, 0.25),
+        rgba(0, 0, 0, 0.75)
+      );
+      min-height: 100vh;
     }
-    .calendar {
-      background: rgba(5, 12, 20, 0.7);
-      border-radius: 1.5rem;
+
+    header,
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem 1rem;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      letter-spacing: 0.05em;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.8);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       padding: 1rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     }
+
+    .calendar-wrapper {
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+    }
+
     .calendar-grid {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 0.75rem;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 0.6rem;
+      width: 100%;
+      padding: 0.5rem;
     }
+
     @media (max-width: 700px) {
-      .calendar-grid { grid-template-columns: repeat(4, 1fr); }
+      .calendar-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
     }
+
     @media (max-width: 480px) {
-      .calendar-grid { grid-template-columns: repeat(3, 1fr); }
+      .calendar-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
+
     .door {
-      position: relative;
       border: none;
-      border-radius: 0.8rem;
-      padding: 1.2rem 0.5rem;
+      border-radius: 0; /* rechteckig */
+      padding: 0.9rem 0.4rem;
       cursor: pointer;
-      font-size: 1.2rem;
-      font-weight: bold;
-      background: var(--locked);
-      color: var(--text);
+      font-size: clamp(1rem, 2.6vw, 1.15rem);
+      font-weight: 700;
+      color: var(--door-text);
+      background: var(--door-locked);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45);
+      transition: transform 0.12s ease, box-shadow 0.12s ease,
+        background 0.2s ease, opacity 0.2s ease;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     }
+
     .door-openable {
-      background: linear-gradient(135deg, var(--openable), #52b788);
+      background: var(--door-open);
     }
+
     .door-openable:hover {
-      transform: translateY(-2px);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.6);
     }
+
+    .door-openable:active {
+      transform: translateY(1px);
+      box-shadow: 0 3px 7px rgba(0, 0, 0, 0.4);
+    }
+
     .door-locked {
-      background: linear-gradient(135deg, var(--locked), #1d3557);
-      opacity: 0.85;
+      background: var(--door-locked);
+      opacity: 0.8;
     }
-    .content {
+
+    .door-locked:disabled {
+      cursor: not-allowed;
+    }
+
+    footer {
+      font-size: 0.95rem;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
+    }
+
+    /* MODAL / INHALTSFENSTER */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: var(--overlay-bg);
+      z-index: 20;
+      padding: 1rem;
+    }
+
+    .modal-backdrop.visible {
+      display: flex;
+    }
+
+    .modal {
       position: relative;
-      background: linear-gradient(135deg, var(--card), #0f1f3a);
-      border-radius: 1.5rem;
-      padding: 1.25rem 1rem 1.5rem 1rem;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: var(--panel-bg);
+      border-radius: 1.2rem;
+      padding: 1.2rem 1.25rem 1.5rem;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
     }
-    .hidden { display: none; }
+
+    .modal h2 {
+      margin: 0 0 0.7rem;
+      font-size: clamp(1.4rem, 2.4vw, 1.7rem);
+      color: var(--accent);
+    }
+
+    .modal p {
+      margin-top: 0;
+      line-height: 1.5;
+      font-size: 0.98rem;
+    }
+
+    .close-button {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.6rem;
+      border: none;
+      background: none;
+      color: var(--text);
+      font-size: 1.6rem;
+      cursor: pointer;
+    }
+
+    .content-media {
+      margin-top: 1rem;
+      display: none;
+      justify-content: center;
+    }
+
+    .content-media.visible {
+      display: flex;
+    }
+
+    .content-media img,
+    .content-media video,
+    .content-media iframe {
+      max-width: 100%;
+      border-radius: 0.8rem;
+      max-height: 420px;
+    }
+
+    .content-media audio {
+      width: 100%;
+    }
   </style>
 </head>
 <body>
-  <header class="header">
-    <h1>🎄 Unser Familien-Adventskalender 🎄</h1>
-  </header>
+  <div class="page-overlay">
+    <header>
+      <h1>Madhouse Adventskalender</h1>
+    </header>
 
-  <main class="main">
-    <section class="calendar">
-      <div id="calendar-grid" class="calendar-grid"></div>
-    </section>
+    <main>
+      <section class="calendar-wrapper">
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
+    </main>
 
-    <section id="content-section" class="content hidden">
-      <button id="close-content" class="close-button" aria-label="Schließen">X</button>
+    <footer>
+      Von Mama und Papa ❤️
+    </footer>
+  </div>
+
+  <!-- MODAL für Inhalte -->
+  <div id="modal-backdrop" class="modal-backdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="content-title">
+      <button id="close-button" class="close-button" aria-label="Schließen">×</button>
       <h2 id="content-title"></h2>
       <p id="content-text"></p>
-    </section>
-  </main>
 
-  <footer class="footer">
-    Mit Liebe gemacht ❤️
-  </footer>
+      <div id="image-wrapper" class="content-media">
+        <img id="content-image" alt="" />
+      </div>
+
+      <div id="audio-wrapper" class="content-media">
+        <audio id="content-audio" controls></audio>
+      </div>
+
+      <div id="video-wrapper" class="content-media">
+        <video id="content-video" controls></video>
+      </div>
+
+      <div id="youtube-wrapper" class="content-media">
+        <iframe
+          id="content-youtube"
+          src=""
+          frameborder="0"
+          allowfullscreen
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        ></iframe>
+      </div>
+    </div>
+  </div>
 
   <script>
+    /*
+      Advent-Inhalte:
+      Du kannst pro Tag beliebige Kombinationen verwenden:
+
+      title: Überschrift (optional, sonst "Tag X")
+      text: Text oder Geschichte
+      image: Bild-URL (z.B. "https://.../bild1.jpg" oder "bilder/tag1.jpg")
+      imageAlt: Alternativtext fürs Bild
+      audio: Audio-URL (z.B. MP3)
+      video: Video-Datei (z.B. MP4)
+      youtube: YouTube-Link (z.B. "https://www.youtube.com/watch?v=...")
+
+      Beispiele unten (nur ein paar Tage ausgefüllt – du kannst alle 24 ergänzen)
+    */
+
     const adventContent = {
-      1: { title: "1. Dezember 🎅", text: "Heute startet unser Advent!" },
-      2: { title: "2. Dezember ❄️", text: "Ein kleiner Gruß für dich." },
-      3: { title: "3. Dezember ⭐", text: "Du bist toll!" },
-      24: { title: "🎁 Frohe Weihnachten 🎁", text: "Wir lieben euch!" }
+      1: {
+        title: "1. Dezember 🎅",
+        text: "Heute startet der Madhouse Adventskalender. Heute Abend machen wir es uns gemeinsam gemütlich.",
+        // Beispiel: Bild vom Hintergrund (falls du willst)
+        // image: "background.jpg",
+        // imageAlt: "Katze im Schnee"
+      },
+      2: {
+        title: "2. Dezember ❄️",
+        text: "Heute gibt es eine kleine Überraschung in der Küche. Schau nach dem Abendessen nach.",
+      },
+      3: {
+        title: "3. Dezember ✨",
+        text: "Hier könnte ein Bild mit Text stehen.",
+        // image: "bilder/tag3.jpg",
+        // imageAlt: "Beispielmotiv"
+      },
+      4: {
+        title: "4. Dezember 🎧",
+        text: "Heute liest Mama oder Papa euch eine Geschichte vor – hier ist die Audio-Version:",
+        // audio: "audio/tag4-geschichte.mp3"
+      },
+      5: {
+        title: "5. Dezember 🎬",
+        text: "Ein kleines Video nur für euch:",
+        // video: "video/tag5.mp4"
+        // oder:
+        // youtube: "https://www.youtube.com/watch?v=DEIN_VIDEO_ID"
+      },
+      24: {
+        title: "24. Dezember – Frohe Weihnachten 🎁",
+        text: "Wir sind so dankbar, dass wir euch haben. Ihr seid unser größtes Geschenk.",
+        // image: "bilder/weihnachten.jpg",
+        // imageAlt: "Weihnachtsbaum"
+      },
     };
 
-    function getToday() {
-      const d = new Date();
-      return (d.getMonth() === 11) ? d.getDate() : 0;
+    function isDayOpenable(day) {
+      const today = new Date();
+      // Nur im Dezember "richtig" sperren.
+      if (today.getMonth() !== 11) {
+        return false;
+      }
+      return today.getDate() >= day;
     }
 
     document.addEventListener("DOMContentLoaded", () => {
       const grid = document.getElementById("calendar-grid");
-      const contentSection = document.getElementById("content-section");
-      const closeBtn = document.getElementById("close-content");
-      const title = document.getElementById("content-title");
-      const text = document.getElementById("content-text");
+      const modalBackdrop = document.getElementById("modal-backdrop");
+      const closeButton = document.getElementById("close-button");
 
-      const currentDay = getToday();
+      const titleEl = document.getElementById("content-title");
+      const textEl = document.getElementById("content-text");
+      const imgWrapper = document.getElementById("image-wrapper");
+      const imgEl = document.getElementById("content-image");
+      const audioWrapper = document.getElementById("audio-wrapper");
+      const audioEl = document.getElementById("content-audio");
+      const videoWrapper = document.getElementById("video-wrapper");
+      const videoEl = document.getElementById("content-video");
+      const ytWrapper = document.getElementById("youtube-wrapper");
+      const ytEl = document.getElementById("content-youtube");
 
+      // Türen erzeugen
       for (let day = 1; day <= 24; day++) {
         const btn = document.createElement("button");
         btn.className = "door";
         btn.textContent = day;
 
-        if (day <= currentDay) {
+        if (isDayOpenable(day)) {
           btn.classList.add("door-openable");
-          btn.onclick = () => openDay(day);
+          btn.addEventListener("click", () => openDoor(day));
         } else {
           btn.classList.add("door-locked");
           btn.disabled = true;
         }
+
         grid.appendChild(btn);
       }
 
-      function openDay(day) {
+      function openDoor(day) {
         const data = adventContent[day];
-        if (!data) return;
+        if (!data) {
+          alert("Für diesen Tag ist noch kein Inhalt eingetragen.");
+          return;
+        }
 
-        title.textContent = data.title;
-        text.textContent = data.text;
-        contentSection.classList.remove("hidden");
+        titleEl.textContent = data.title || `Tag ${day}`;
+        textEl.textContent = data.text || "";
+
+        // alles zurücksetzen
+        imgWrapper.classList.remove("visible");
+        audioWrapper.classList.remove("visible");
+        videoWrapper.classList.remove("visible");
+        ytWrapper.classList.remove("visible");
+        imgEl.src = "";
+        audioEl.src = "";
+        videoEl.src = "";
+        ytEl.src = "";
+
+        if (data.image) {
+          imgEl.src = data.image;
+          imgEl.alt = data.imageAlt || "";
+          imgWrapper.classList.add("visible");
+        }
+        if (data.audio) {
+          audioEl.src = data.audio;
+          audioWrapper.classList.add("visible");
+        }
+        if (data.video) {
+          videoEl.src = data.video;
+          videoWrapper.classList.add("visible");
+        }
+        if (data.youtube) {
+          try {
+            const url = new URL(data.youtube);
+            let videoId = url.searchParams.get("v");
+            if (!videoId && url.hostname === "youtu.be") {
+              videoId = url.pathname.replace("/", "");
+            }
+            if (!videoId && url.pathname.startsWith("/shorts/")) {
+              videoId = url.pathname.split("/")[2];
+            }
+            if (videoId) {
+              ytEl.src = "https://www.youtube.com/embed/" + videoId;
+              ytWrapper.classList.add("visible");
+            }
+          } catch (e) {
+            console.warn("Ungültige YouTube-URL:", data.youtube);
+          }
+        }
+
+        modalBackdrop.classList.add("visible");
+        modalBackdrop.setAttribute("aria-hidden", "false");
       }
 
-      closeBtn.onclick = () => {
-        contentSection.classList.add("hidden");
-      };
+      function closeModal() {
+        modalBackdrop.classList.remove("visible");
+        modalBackdrop.setAttribute("aria-hidden", "true");
+        audioEl.pause();
+        videoEl.pause();
+        ytEl.src = "";
+      }
+
+      closeButton.addEventListener("click", closeModal);
+      modalBackdrop.addEventListener("click", (e) => {
+        if (e.target === modalBackdrop) {
+          closeModal();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          closeModal();
+        }
+      });
     });
   </script>
 </body>
